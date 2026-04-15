@@ -4,13 +4,13 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useI18n } from '@/i18n/I18nProvider'
 import { mockBlogPosts } from '@/data/mockData'
-import { BookOpen, Newspaper, FileText, ChevronRight, MessageCircle } from 'lucide-react'
+import { ChevronRight, MessageCircle } from 'lucide-react'
+import { getBlogImage } from '@/utils/productImages'
 
 export function BlogPage() {
   const { t, lang } = useI18n()
   const getText = (obj: Record<string, string>) => obj[lang] || obj.ru || ''
 
-  const typeIcon: Record<string, typeof BookOpen> = { unpacking: BookOpen, news: Newspaper, guide: FileText }
   const typeLabel: Record<string, string> = {
     unpacking: t('blog.typeUnpacking'),
     news: t('blog.typeNews'),
@@ -22,11 +22,10 @@ export function BlogPage() {
       <h1 className="text-3xl font-bold mb-8">{t('blog.title')}</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {mockBlogPosts.map(post => {
-          const Icon = typeIcon[post.type] || FileText
           return (
             <Card key={post.id} className="group hover:shadow-lg transition-all overflow-hidden">
-              <div className="aspect-video bg-gradient-to-br from-primary/5 to-accent/20 relative flex items-center justify-center">
-                <Icon className="w-16 h-16 text-primary/20" />
+              <div className="aspect-video relative overflow-hidden">
+                <img src={getBlogImage(post.type)} alt={getText(post.title)} className="w-full h-full object-cover" />
                 <div className="absolute top-3 left-3">
                   <Badge variant="secondary">{typeLabel[post.type] || post.type}</Badge>
                 </div>

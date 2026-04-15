@@ -72,6 +72,7 @@ export const translations: Translations = {
   'type.digital': { ru: 'Цифровой', uk: 'Цифровий', en: 'Digital', pl: 'Cyfrowy' },
   'type.service': { ru: 'Услуга', uk: 'Послуга', en: 'Service', pl: 'Usługa' },
   'type.aiContent': { ru: 'AI-контент', uk: 'AI-контент', en: 'AI Content', pl: 'Treść AI' },
+  'type.ai_content': { ru: 'AI-контент', uk: 'AI-контент', en: 'AI Content', pl: 'Treść AI' },
 
   // === Catalog ===
   'catalog.title': { ru: 'Каталог объектов', uk: "Каталог об'єктів", en: 'Object catalog', pl: 'Katalog obiektów' },

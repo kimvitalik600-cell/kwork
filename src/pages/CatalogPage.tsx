@@ -12,26 +12,9 @@ import { Separator } from '@/components/ui/separator'
 import type { ObjectType, ObjectStatus } from '@/types'
 import {
   Package, BookOpen, FileText, Search, SlidersHorizontal,
-  ChevronRight, X, ArrowUpDown, ShoppingBag, Megaphone, Sparkles,
+  ChevronRight, X, ArrowUpDown,
 } from 'lucide-react'
-
-const typeVisuals: Record<string, { gradient: string; icon: typeof Package; emoji: string }> = {
-  material: { gradient: 'from-blue-500/20 to-cyan-500/20', icon: ShoppingBag, emoji: '👕' },
-  digital: { gradient: 'from-purple-500/20 to-pink-500/20', icon: BookOpen, emoji: '📱' },
-  service: { gradient: 'from-green-500/20 to-emerald-500/20', icon: Megaphone, emoji: '🚀' },
-  ai_content: { gradient: 'from-orange-500/20 to-yellow-500/20', icon: Sparkles, emoji: '🎨' },
-}
-
-const categoryVisuals: Record<string, string> = {
-  'cat-1': '🧥', // material assets
-  'cat-2': '📚', // digital books
-  'cat-3': '🔑', // keys/promo
-  'cat-4': '👤', // accounts
-  'cat-5': '📢', // promo services
-  'cat-6': '🧊', // 3d models
-  'cat-7': '🖼️', // ai arts
-  'cat-8': '✨', // user content
-}
+import { getObjectImage } from '@/utils/productImages'
 
 export function CatalogPage() {
   const { t, lang } = useI18n()
@@ -236,11 +219,8 @@ export function CatalogPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
             {filteredObjects.map(obj => (
               <Card key={obj.id} className="group card-hover overflow-hidden">
-                <div className={`aspect-[4/3] relative bg-gradient-to-br ${typeVisuals[obj.type]?.gradient || 'from-muted to-muted/50'}`}>
-                  <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className="text-5xl mb-2">{categoryVisuals[obj.categoryId] || typeVisuals[obj.type]?.emoji || '📦'}</span>
-                    {(() => { const Icon = typeVisuals[obj.type]?.icon || Package; return <Icon className="w-8 h-8 text-foreground/10" /> })()}
-                  </div>
+                <div className="aspect-[4/3] relative overflow-hidden">
+                  <img src={getObjectImage(obj.id, obj.type, obj.categoryId)} alt={getText(obj.title)} className="w-full h-full object-cover" />
                   <div className="absolute top-2 left-2 flex gap-1">
                     {statusBadge(obj.status)}
                   </div>

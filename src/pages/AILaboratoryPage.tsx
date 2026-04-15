@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { useI18n } from '@/i18n/I18nProvider'
 import { Cpu, Sparkles, Image, FileText, ArrowUpRight, Zap, Loader2, Download, Copy, Check } from 'lucide-react'
+import { generateAIImage } from '@/utils/productImages'
 
 type AITab = 'overview' | 'image' | 'text' | 'upscale' | 'variation' | 'history' | 'subscription'
 
@@ -28,18 +29,6 @@ function mockGenerateText(prompt: string): string {
   if (p.includes('код') || p.includes('code') || p.includes('функци'))
     return '```typescript\ninterface DataProcessor<T> {\n  process(input: T): Promise<T>;\n  validate(data: T): boolean;\n}\n\nclass SmartProcessor implements DataProcessor<Record<string, unknown>> {\n  async process(input: Record<string, unknown>) {\n    const validated = this.validate(input);\n    if (!validated) throw new Error(\'Invalid data\');\n    return Object.entries(input).reduce((acc, [key, value]) => {\n      acc[key] = typeof value === \'string\' ? value.trim() : value;\n      return acc;\n    }, {} as Record<string, unknown>);\n  }\n  validate(data: Record<string, unknown>) {\n    return data !== null && Object.keys(data).length > 0;\n  }\n}\n```\n\nЭтот код демонстрирует паттерн обработки данных с валидацией и типизацией в TypeScript.'
   return `Результат генерации по запросу: "${prompt}"\n\nЭто текст, сгенерированный AI на основе вашего промпта. В полной версии платформы здесь будет результат от настоящей языковой модели (GPT-4o, Claude, Gemini и др.).\n\nДля получения более качественных результатов:\n• Используйте подробные описания\n• Указывайте желаемый стиль и формат\n• Добавляйте контекст и примеры`
-}
-
-function mockGenerateImage(prompt: string): string {
-  const colors = [['#6366f1','#8b5cf6','#a78bfa'],['#f43f5e','#ec4899','#f472b6'],['#10b981','#14b8a6','#34d399'],['#f59e0b','#f97316','#fbbf24'],['#3b82f6','#6366f1','#818cf8']]
-  const palette = colors[Math.floor(Math.random() * colors.length)]
-  let shapes = ''
-  for (let i = 0; i < 8; i++) {
-    const cx = Math.random() * 400, cy = Math.random() * 400, r = Math.random() * 80 + 20
-    shapes += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${palette[i % 3]}" opacity="${(Math.random()*0.5+0.2).toFixed(2)}"/>`
-  }
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400"><defs><linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:${palette[0]};stop-opacity:0.3"/><stop offset="100%" style="stop-color:${palette[2]};stop-opacity:0.3"/></linearGradient></defs><rect width="400" height="400" fill="url(#bg)"/>${shapes}<text x="200" y="380" text-anchor="middle" fill="white" font-size="11" opacity="0.6" font-family="sans-serif">AI • ${prompt.slice(0,30)}</text></svg>`
-  return `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`
 }
 
 export function AILaboratoryPage() {
@@ -69,7 +58,7 @@ export function AILaboratoryPage() {
     setImgLoading(true); setImgResults([])
     setTimeout(() => {
       const r: string[] = []
-      for (let i = 0; i < imgQty; i++) r.push(mockGenerateImage(imgPrompt))
+      for (let i = 0; i < imgQty; i++) r.push(generateAIImage(imgPrompt + (i > 0 ? ` v${i+1}` : '')))
       setImgResults(r); setImgLoading(false)
       setHistory(prev => [{ id: `g-${Date.now()}`, type: 'image', prompt: imgPrompt, tokens: imgQty * 5, date: new Date().toISOString().split('T')[0], model: imgModel }, ...prev])
     }, 1500 + Math.random() * 1500)

@@ -4,7 +4,8 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useI18n } from '@/i18n/I18nProvider'
 import { mockBlogPosts } from '@/data/mockData'
-import { BookOpen, ChevronRight, MessageCircle, Package } from 'lucide-react'
+import { ChevronRight, MessageCircle, Package } from 'lucide-react'
+import { getBlogImage } from '@/utils/productImages'
 
 export function UnpackingsPage() {
   const { t, lang } = useI18n()
@@ -17,8 +18,8 @@ export function UnpackingsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {unpackings.map(post => (
           <Card key={post.id} className="group hover:shadow-lg transition-all overflow-hidden">
-            <div className="aspect-video bg-gradient-to-br from-primary/5 to-accent/20 relative flex items-center justify-center">
-              <BookOpen className="w-20 h-20 text-primary/20" />
+            <div className="aspect-video relative overflow-hidden">
+              <img src={getBlogImage('unpacking')} alt={getText(post.title)} className="w-full h-full object-cover" />
               {post.relatedObjectIds && post.relatedObjectIds.length > 0 && (
                 <div className="absolute bottom-3 left-3">
                   <Badge variant="info" className="gap-1"><Package className="w-3 h-3" /> {post.relatedObjectIds.length} {t('term.object').toLowerCase()}</Badge>
