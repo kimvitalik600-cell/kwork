@@ -35,10 +35,12 @@ export function CatalogPage() {
         getText(o.title).toLowerCase().includes(q) ||
         getText(o.shortDescription).toLowerCase().includes(q)
       )
+      // When searching, skip category filter so results span all categories
+    } else {
+      if (selectedCategory) result = result.filter(o => o.categoryId === selectedCategory)
     }
     if (selectedType) result = result.filter(o => o.type === selectedType)
     if (selectedStatus) result = result.filter(o => o.status === selectedStatus)
-    if (selectedCategory) result = result.filter(o => o.categoryId === selectedCategory)
 
     result.sort((a, b) => {
       switch (sortBy) {

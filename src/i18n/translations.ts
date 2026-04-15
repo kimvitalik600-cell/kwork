@@ -19,6 +19,7 @@ export const translations: Translations = {
   'nav.login': { ru: 'Войти', uk: 'Увійти', en: 'Sign in', pl: 'Zaloguj się' },
   'nav.register': { ru: 'Регистрация', uk: 'Реєстрація', en: 'Sign up', pl: 'Rejestracja' },
   'nav.dashboard': { ru: 'Личный кабинет', uk: 'Особистий кабінет', en: 'Dashboard', pl: 'Panel' },
+  'nav.logout': { ru: 'Выйти', uk: 'Вийти', en: 'Sign out', pl: 'Wyloguj się' },
   'nav.infoPackage': { ru: 'Инфо-пакет', uk: 'Інфо-пакет', en: 'Info Package', pl: 'Pakiet informacyjny' },
 
   // === Hero ===
@@ -125,6 +126,22 @@ export const translations: Translations = {
   'dashboard.verification': { ru: 'Верификация', uk: 'Верифікація', en: 'Verification', pl: 'Weryfikacja' },
   'dashboard.premium': { ru: 'Premium', uk: 'Premium', en: 'Premium', pl: 'Premium' },
 
+  // === Dashboard balance/settings ===
+  'dashboard.mainBalance': { ru: 'Основной баланс', uk: 'Основний баланс', en: 'Main balance', pl: 'Saldo główne' },
+  'dashboard.credits': { ru: 'Кредиты', uk: 'Кредити', en: 'Credits', pl: 'Kredyty' },
+  'dashboard.creditsUnit': { ru: 'кр.', uk: 'кр.', en: 'cr.', pl: 'kr.' },
+  'dashboard.aiTokens': { ru: 'AI-токены', uk: 'AI-токени', en: 'AI tokens', pl: 'Tokeny AI' },
+  'dashboard.tokensUnit': { ru: 'токенов', uk: 'токенів', en: 'tokens', pl: 'tokenów' },
+  'dashboard.topUp': { ru: 'Пополнить', uk: 'Поповнити', en: 'Top up', pl: 'Doładuj' },
+  'dashboard.paymentMethods': { ru: 'Способы оплаты', uk: 'Способи оплати', en: 'Payment methods', pl: 'Metody płatności' },
+  'dashboard.transactionHistory': { ru: 'История операций', uk: 'Історія операцій', en: 'Transaction history', pl: 'Historia transakcji' },
+  'settings.profile': { ru: 'Профиль', uk: 'Профіль', en: 'Profile', pl: 'Profil' },
+  'settings.account': { ru: 'Аккаунт', uk: 'Акаунт', en: 'Account', pl: 'Konto' },
+  'settings.notifications': { ru: 'Уведомления', uk: 'Сповіщення', en: 'Notifications', pl: 'Powiadomienia' },
+  'settings.emailHint': { ru: 'Email нельзя изменить', uk: 'Email не можна змінити', en: 'Email cannot be changed', pl: 'Nie można zmienić emaila' },
+  'settings.saved': { ru: 'Сохранено', uk: 'Збережено', en: 'Saved', pl: 'Zapisano' },
+  'settings.memberSince': { ru: 'Зарегистрирован', uk: 'Зареєстрований', en: 'Member since', pl: 'Członek od' },
+
   // === Admin ===
   'admin.title': { ru: 'Панель администратора', uk: 'Панель адміністратора', en: 'Admin Panel', pl: 'Panel administratora' },
   'admin.dashboard': { ru: 'Дашборд', uk: 'Дашборд', en: 'Dashboard', pl: 'Dashboard' },
@@ -162,6 +179,8 @@ export const translations: Translations = {
   'common.yes': { ru: 'Да', uk: 'Так', en: 'Yes', pl: 'Tak' },
   'common.no': { ru: 'Нет', uk: 'Ні', en: 'No', pl: 'Nie' },
   'common.close': { ru: 'Закрыть', uk: 'Закрити', en: 'Close', pl: 'Zamknij' },
+  'common.comingSoon': { ru: 'Скоро', uk: 'Незабаром', en: 'Coming soon', pl: 'Wkrótce' },
+  'common.sectionInDevelopment': { ru: 'Раздел находится в разработке', uk: 'Розділ знаходиться в розробці', en: 'This section is under development', pl: 'Ta sekcja jest w trakcie opracowywania' },
 
   // === Donations ===
   'donate.title': { ru: 'Поддержать проект', uk: 'Підтримати проєкт', en: 'Support the project', pl: 'Wesprzyj projekt' },
@@ -251,6 +270,14 @@ export const translations: Translations = {
   // === Blog / News ===
   'blog.title': { ru: 'Блог', uk: 'Блог', en: 'Blog', pl: 'Blog' },
   'blog.readMore': { ru: 'Читать далее', uk: 'Читати далі', en: 'Read more', pl: 'Czytaj dalej' },
+  'blog.typeUnpacking': { ru: 'Распаковка', uk: 'Розпаковка', en: 'Unpacking', pl: 'Rozpakowywanie' },
+  'blog.typeNews': { ru: 'Новость', uk: 'Новина', en: 'News', pl: 'Aktualność' },
+  'blog.typeGuide': { ru: 'Гайд', uk: 'Гайд', en: 'Guide', pl: 'Poradnik' },
+  'blog.pinned': { ru: 'Закреплено', uk: 'Закріплено', en: 'Pinned', pl: 'Przypięte' },
+  'blog.comments': { ru: 'комментариев', uk: 'коментарів', en: 'comments', pl: 'komentarzy' },
+  'blog.relatedObjects': { ru: 'Связанные объекты', uk: 'Пов\'язані об\'єкти', en: 'Related objects', pl: 'Powiązane obiekty' },
+  'blog.noContent': { ru: 'Контент ещё не добавлен.', uk: 'Контент ще не додано.', en: 'Content not yet added.', pl: 'Treść jeszcze nie dodana.' },
+  'blog.allPosts': { ru: 'Все публикации', uk: 'Всі публікації', en: 'All posts', pl: 'Wszystkie wpisy' },
   'news.title': { ru: 'Новости', uk: 'Новини', en: 'News', pl: 'Aktualności' },
   'unpackings.title': { ru: 'Архив распаковок', uk: 'Архів розпаковок', en: 'Unpackings archive', pl: 'Archiwum rozpakowań' },
 
@@ -293,6 +320,16 @@ export const translations: Translations = {
   'auth.registerSuccess': { ru: 'Регистрация выполнена! Добро пожаловать!', uk: 'Реєстрацію виконано! Ласкаво просимо!', en: 'Registration complete! Welcome!', pl: 'Rejestracja zakończona! Witamy!' },
   'auth.fillAllFields': { ru: 'Заполните все поля', uk: 'Заповніть усі поля', en: 'Fill in all fields', pl: 'Wypełnij wszystkie pola' },
   'auth.passwordMismatch': { ru: 'Пароли не совпадают', uk: 'Паролі не збігаються', en: 'Passwords do not match', pl: 'Hasła nie pasują' },
+  'auth.loginSubtitle': { ru: 'Войдите в свой личный кабинет', uk: 'Увійдіть у свій особистий кабінет', en: 'Sign in to your account', pl: 'Zaloguj się do swojego konta' },
+  'auth.registerSubtitle': { ru: 'Создайте аккаунт для доступа к платформе', uk: 'Створіть акаунт для доступу до платформи', en: 'Create an account to access the platform', pl: 'Utwórz konto, aby uzyskać dostęp do platformy' },
+  'auth.namePlaceholder': { ru: 'Ваше имя', uk: "Ваше ім'я", en: 'Your name', pl: 'Twoje imię' },
+  'auth.acceptText': { ru: 'Я принимаю условия', uk: 'Я приймаю умови', en: 'I accept the', pl: 'Akceptuję warunki' },
+  'auth.offerLink': { ru: 'публичной оферты', uk: 'публічної оферти', en: 'public offer', pl: 'oferty publicznej' },
+  'auth.passwordTooShort': { ru: 'Пароль должен быть не менее 6 символов', uk: 'Пароль має бути не менше 6 символів', en: 'Password must be at least 6 characters', pl: 'Hasło musi mieć co najmniej 6 znaków' },
+  'auth.acceptOffer': { ru: 'Необходимо принять условия оферты', uk: 'Необхідно прийняти умови оферти', en: 'You must accept the offer terms', pl: 'Musisz zaakceptować warunki oferty' },
+  'auth.userNotFound': { ru: 'Пользователь не найден или неверный пароль', uk: 'Користувача не знайдено або невірний пароль', en: 'User not found or incorrect password', pl: 'Użytkownik nie znaleziony lub nieprawidłowe hasło' },
+  'auth.emailTaken': { ru: 'Этот email уже используется', uk: 'Цей email вже використовується', en: 'This email is already in use', pl: 'Ten email jest już używany' },
+  'auth.loginRequired': { ru: 'Для просмотра этой страницы необходимо войти в аккаунт', uk: 'Для перегляду цієї сторінки необхідно увійти в акаунт', en: 'You must be logged in to view this page', pl: 'Musisz być zalogowany, aby wyświetlić tę stronę' },
 
   // === Market ===
   'market.title': { ru: 'Маркет (P2P)', uk: 'Маркет (P2P)', en: 'Market (P2P)', pl: 'Market (P2P)' },
@@ -407,11 +444,6 @@ export const translations: Translations = {
   'admin.warehouse': { ru: 'Складской учёт', uk: 'Складський облік', en: 'Warehouse management', pl: 'Zarządzanie magazynem' },
   'admin.portalSettings': { ru: 'Настройки портала', uk: 'Налаштування порталу', en: 'Portal settings', pl: 'Ustawienia portalu' },
   'admin.systemLogs': { ru: 'Логи системы', uk: 'Логи системи', en: 'System logs', pl: 'Logi systemowe' },
-
-  // === Blog/News type labels ===
-  'blog.typeUnpacking': { ru: 'Распаковка', uk: 'Розпаковка', en: 'Unpacking', pl: 'Rozpakowanie' },
-  'blog.typeNews': { ru: 'Новость', uk: 'Новина', en: 'News', pl: 'Aktualność' },
-  'blog.typeGuide': { ru: 'Гайд', uk: 'Гайд', en: 'Guide', pl: 'Poradnik' },
 
   // === Market features ===
   'market.p2pDesc': { ru: 'Пользователи могут публиковать объявления', uk: 'Користувачі можуть публікувати оголошення', en: 'Users can publish listings', pl: 'Użytkownicy mogą publikować ogłoszenia' },

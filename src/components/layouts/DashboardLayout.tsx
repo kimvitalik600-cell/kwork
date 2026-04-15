@@ -1,5 +1,6 @@
-import { Outlet, Link, useLocation } from 'react-router-dom'
+import { Outlet, Link, useLocation, Navigate, useNavigate } from 'react-router-dom'
 import { useI18n } from '@/i18n/I18nProvider'
+import { useAuth } from '@/hooks/useAuth'
 import {
   User,
   FileText,
@@ -15,12 +16,20 @@ import {
   Megaphone,
   ShieldCheck,
   Crown,
+  ArrowLeft,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button'
 
 export function DashboardLayout() {
   const { t } = useI18n()
   const location = useLocation()
+  const navigate = useNavigate()
+  const { isAuthenticated, user } = useAuth()
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace state={{ from: location }} />
+  }
 
   const sidebarLinks = [
     { to: '/dashboard', label: t('dashboard.title'), icon: User, exact: true },
@@ -46,9 +55,27 @@ export function DashboardLayout() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      {/* Back button */}
+      <div className="mb-4">
+        <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="gap-2 text-muted-foreground hover:text-foreground">
+          <ArrowLeft className="w-4 h-4" />
+          {t('common.back')}
+        </Button>
+      </div>
+
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Sidebar */}
         <aside className="lg:w-64 shrink-0">
+          {/* User info card */}
+          <div className="mb-3 bg-card border rounded-xl p-4 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center text-primary-foreground font-bold text-sm shrink-0">
+              {user?.name.charAt(0).toUpperCase()}
+            </div>
+            <div className="min-w-0">
+              <p className="font-semibold text-sm truncate">{user?.name}</p>
+              <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+            </div>
+          </div>
           <nav className="space-y-1 lg:sticky lg:top-24 bg-card border rounded-xl p-3">
             {sidebarLinks.map(link => {
               const Icon = link.icon
@@ -79,3 +106,4 @@ export function DashboardLayout() {
     </div>
   )
 }
+

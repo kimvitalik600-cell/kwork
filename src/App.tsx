@@ -11,6 +11,7 @@ import { ObjectDetailPage } from '@/pages/ObjectDetailPage'
 import { InfoPackagePage } from '@/pages/InfoPackagePage'
 import { RequestCheckoutPage } from '@/pages/RequestCheckoutPage'
 import { BlogPage } from '@/pages/BlogPage'
+import { BlogPostPage } from '@/pages/BlogPostPage'
 import { NewsPage } from '@/pages/NewsPage'
 import { UnpackingsPage } from '@/pages/UnpackingsPage'
 import { AILaboratoryPage } from '@/pages/AILaboratoryPage'
@@ -29,6 +30,8 @@ import { DashboardHome } from '@/pages/dashboard/DashboardHome'
 import { MyLotsPage } from '@/pages/dashboard/MyLotsPage'
 import { DigitalInventoryPage } from '@/pages/dashboard/DigitalInventoryPage'
 import { MyGenerationPage } from '@/pages/dashboard/MyGenerationPage'
+import { DashboardBalancePage } from '@/pages/dashboard/DashboardBalancePage'
+import { DashboardSettingsPage } from '@/pages/dashboard/DashboardSettingsPage'
 import { DashboardPlaceholder } from '@/pages/dashboard/DashboardPlaceholder'
 
 // Admin pages
@@ -54,6 +57,7 @@ export default function App() {
             <Route path="info-package" element={<InfoPackagePage />} />
             <Route path="request/checkout" element={<RequestCheckoutPage />} />
             <Route path="blog" element={<BlogPage />} />
+            <Route path="blog/:slug" element={<BlogPostPage />} />
             <Route path="news" element={<NewsPage />} />
             <Route path="unpackings" element={<UnpackingsPage />} />
             <Route path="ai" element={<AILaboratoryPage />} />
@@ -82,14 +86,14 @@ export default function App() {
             <Route path="my-generation" element={<MyGenerationPage />} />
             <Route path="requests" element={<DashboardPlaceholder titleKey="dashboard.myRequests" />} />
             <Route path="unpackings" element={<DashboardPlaceholder titleKey="dashboard.unpackingArchive" />} />
-            <Route path="balance" element={<DashboardPlaceholder titleKey="dashboard.balance" />} />
+            <Route path="balance" element={<DashboardBalancePage />} />
             <Route path="invoices" element={<DashboardPlaceholder titleKey="dashboard.invoices" />} />
             <Route path="ads" element={<DashboardPlaceholder titleKey="dashboard.myAds" />} />
             <Route path="notifications" element={<DashboardPlaceholder titleKey="dashboard.notifications" />} />
             <Route path="support" element={<DashboardPlaceholder titleKey="dashboard.support" />} />
             <Route path="verification" element={<DashboardPlaceholder titleKey="dashboard.verification" />} />
             <Route path="premium" element={<DashboardPlaceholder titleKey="dashboard.premium" />} />
-            <Route path="settings" element={<DashboardPlaceholder titleKey="dashboard.settings" />} />
+            <Route path="settings" element={<DashboardSettingsPage />} />
           </Route>
 
           {/* Admin routes */}

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Card, CardContent } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -99,8 +100,10 @@ export function MarketPage() {
           <CardContent className="p-8 text-center">
             <h3 className="text-xl font-bold mb-2">{t('market.ctaTitle')}</h3>
             <p className="text-muted-foreground mb-4 max-w-lg mx-auto">{t('market.ctaDesc')}</p>
-            <Button size="lg" className="gap-2">
-              {t('market.ctaButton')} <ArrowRight className="w-4 h-4" />
+            <Button size="lg" className="gap-2" asChild>
+              <Link to="/contacts">
+                {t('market.ctaButton')} <ArrowRight className="w-4 h-4" />
+              </Link>
             </Button>
           </CardContent>
         </Card>
