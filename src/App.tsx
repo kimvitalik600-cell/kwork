@@ -32,7 +32,14 @@ import { DigitalInventoryPage } from '@/pages/dashboard/DigitalInventoryPage'
 import { MyGenerationPage } from '@/pages/dashboard/MyGenerationPage'
 import { DashboardBalancePage } from '@/pages/dashboard/DashboardBalancePage'
 import { DashboardSettingsPage } from '@/pages/dashboard/DashboardSettingsPage'
-import { DashboardPlaceholder } from '@/pages/dashboard/DashboardPlaceholder'
+import { RequestsPage } from '@/pages/dashboard/RequestsPage'
+import { DashboardUnpackingsPage } from '@/pages/dashboard/UnpackingsPage'
+import { InvoicesPage } from '@/pages/dashboard/InvoicesPage'
+import { AdsPage } from '@/pages/dashboard/AdsPage'
+import { NotificationsPage } from '@/pages/dashboard/NotificationsPage'
+import { SupportPage } from '@/pages/dashboard/SupportPage'
+import { VerificationPage } from '@/pages/dashboard/VerificationPage'
+import { PremiumPage } from '@/pages/dashboard/PremiumPage'
 
 // Admin pages
 import { AdminDashboard } from '@/pages/admin/AdminDashboard'
@@ -84,15 +91,15 @@ export default function App() {
             <Route path="lots" element={<MyLotsPage />} />
             <Route path="digital-inventory" element={<DigitalInventoryPage />} />
             <Route path="my-generation" element={<MyGenerationPage />} />
-            <Route path="requests" element={<DashboardPlaceholder titleKey="dashboard.myRequests" />} />
-            <Route path="unpackings" element={<DashboardPlaceholder titleKey="dashboard.unpackingArchive" />} />
+            <Route path="requests" element={<RequestsPage />} />
+            <Route path="unpackings" element={<DashboardUnpackingsPage />} />
             <Route path="balance" element={<DashboardBalancePage />} />
-            <Route path="invoices" element={<DashboardPlaceholder titleKey="dashboard.invoices" />} />
-            <Route path="ads" element={<DashboardPlaceholder titleKey="dashboard.myAds" />} />
-            <Route path="notifications" element={<DashboardPlaceholder titleKey="dashboard.notifications" />} />
-            <Route path="support" element={<DashboardPlaceholder titleKey="dashboard.support" />} />
-            <Route path="verification" element={<DashboardPlaceholder titleKey="dashboard.verification" />} />
-            <Route path="premium" element={<DashboardPlaceholder titleKey="dashboard.premium" />} />
+            <Route path="invoices" element={<InvoicesPage />} />
+            <Route path="ads" element={<AdsPage />} />
+            <Route path="notifications" element={<NotificationsPage />} />
+            <Route path="support" element={<SupportPage />} />
+            <Route path="verification" element={<VerificationPage />} />
+            <Route path="premium" element={<PremiumPage />} />
             <Route path="settings" element={<DashboardSettingsPage />} />
           </Route>
 

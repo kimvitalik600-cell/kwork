@@ -1,4 +1,4 @@
-import { Outlet, Link, useLocation, Navigate, useNavigate } from 'react-router-dom'
+import { Outlet, Link, useLocation, Navigate } from 'react-router-dom'
 import { useI18n } from '@/i18n/I18nProvider'
 import { useAuth } from '@/hooks/useAuth'
 import {
@@ -16,7 +16,7 @@ import {
   Megaphone,
   ShieldCheck,
   Crown,
-  ArrowLeft,
+  Home,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
@@ -24,7 +24,6 @@ import { Button } from '@/components/ui/button'
 export function DashboardLayout() {
   const { t } = useI18n()
   const location = useLocation()
-  const navigate = useNavigate()
   const { isAuthenticated, user } = useAuth()
 
   if (!isAuthenticated) {
@@ -55,12 +54,14 @@ export function DashboardLayout() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      {/* Back button */}
+      {/* Home button */}
       <div className="mb-4">
-        <Button variant="ghost" size="sm" onClick={() => navigate(-1)} className="gap-2 text-muted-foreground hover:text-foreground">
-          <ArrowLeft className="w-4 h-4" />
-          {t('common.back')}
-        </Button>
+        <Link to="/">
+          <Button variant="ghost" size="sm" className="gap-2 text-muted-foreground hover:text-foreground">
+            <Home className="w-4 h-4" />
+            {t('nav.home')}
+          </Button>
+        </Link>
       </div>
 
       <div className="flex flex-col lg:flex-row gap-8">

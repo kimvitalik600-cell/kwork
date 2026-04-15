@@ -6,7 +6,29 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useI18n } from '@/i18n/I18nProvider'
 import { useAuth } from '@/hooks/useAuth'
-import { LogIn, UserPlus } from 'lucide-react'
+import { LogIn, UserPlus, Eye, EyeOff } from 'lucide-react'
+
+function PasswordInput({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder?: string }) {
+  const [show, setShow] = useState(false)
+  return (
+    <div className="relative">
+      <Input
+        type={show ? 'text' : 'password'}
+        placeholder={placeholder || '••••••••'}
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        className="pr-10"
+      />
+      <button
+        type="button"
+        onClick={() => setShow(!show)}
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+      >
+        {show ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+      </button>
+    </div>
+  )
+}
 
 export function LoginPage() {
   const { t } = useI18n()
@@ -48,7 +70,9 @@ export function LoginPage() {
             </div>
             <div>
               <Label>{t('auth.password')}</Label>
-              <Input type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} className="mt-1" />
+              <div className="mt-1">
+                <PasswordInput value={password} onChange={setPassword} />
+              </div>
             </div>
             {error && <p className="text-sm text-destructive bg-destructive/10 px-3 py-2 rounded-md">{error}</p>}
             <Button className="w-full" type="submit" disabled={loading}>
@@ -114,11 +138,15 @@ export function RegisterPage() {
             </div>
             <div>
               <Label>{t('auth.password')}</Label>
-              <Input type="password" placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} className="mt-1" />
+              <div className="mt-1">
+                <PasswordInput value={password} onChange={setPassword} />
+              </div>
             </div>
             <div>
               <Label>{t('auth.confirmPassword')}</Label>
-              <Input type="password" placeholder="••••••••" value={confirm} onChange={e => setConfirm(e.target.value)} className="mt-1" />
+              <div className="mt-1">
+                <PasswordInput value={confirm} onChange={setConfirm} />
+              </div>
             </div>
             <div className="flex items-start gap-2">
               <input type="checkbox" id="accept" checked={accept} onChange={e => setAccept(e.target.checked)} className="mt-1 accent-primary" />

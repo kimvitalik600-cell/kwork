@@ -309,6 +309,14 @@ export const translations: Translations = {
   'ai.styleAnime': { ru: 'Аниме', uk: 'Аніме', en: 'Anime', pl: 'Anime' },
   'ai.stylePainting': { ru: 'Живопись', uk: 'Живопис', en: 'Painting', pl: 'Malarstwo' },
   'ai.styleMinimal': { ru: 'Минимализм', uk: 'Мінімалізм', en: 'Minimalism', pl: 'Minimalizm' },
+  'ai.generating': { ru: 'Генерация...', uk: 'Генерація...', en: 'Generating...', pl: 'Generowanie...' },
+  'ai.result': { ru: 'Результат', uk: 'Результат', en: 'Result', pl: 'Wynik' },
+  'ai.download': { ru: 'Скачать', uk: 'Завантажити', en: 'Download', pl: 'Pobierz' },
+  'ai.copied': { ru: 'Скопировано!', uk: 'Скопійовано!', en: 'Copied!', pl: 'Skopiowano!' },
+  'ai.copy': { ru: 'Копировать', uk: 'Копіювати', en: 'Copy', pl: 'Kopiuj' },
+  'ai.dragOrClick': { ru: 'Перетащите файл или нажмите для загрузки', uk: 'Перетягніть файл або натисніть для завантаження', en: 'Drag a file or click to upload', pl: 'Przeciągnij plik lub kliknij, aby przesłać' },
+  'ai.uploadImage': { ru: 'Загрузить изображение', uk: 'Завантажити зображення', en: 'Upload image', pl: 'Prześlij obraz' },
+  'ai.noHistory': { ru: 'История генераций пуста', uk: 'Історія генерацій порожня', en: 'No generation history', pl: 'Brak historii generacji' },
 
   // === Auth ===
   'auth.password': { ru: 'Пароль', uk: 'Пароль', en: 'Password', pl: 'Hasło' },

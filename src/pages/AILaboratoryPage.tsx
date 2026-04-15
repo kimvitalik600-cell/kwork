@@ -4,13 +4,85 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { useI18n } from '@/i18n/I18nProvider'
-import { Cpu, Sparkles, Image, FileText, ArrowUpRight, Zap } from 'lucide-react'
+import { Cpu, Sparkles, Image, FileText, ArrowUpRight, Zap, Loader2, Download, Copy, Check } from 'lucide-react'
 
 type AITab = 'overview' | 'image' | 'text' | 'upscale' | 'variation' | 'history' | 'subscription'
+
+interface GenerationResult {
+  id: string
+  type: 'image' | 'text'
+  prompt: string
+  tokens: number
+  date: string
+  model: string
+}
+
+function mockGenerateText(prompt: string): string {
+  const p = prompt.toLowerCase()
+  if (p.includes('сказк') || p.includes('fairy') || p.includes('tale'))
+    return 'В далёком-далёком королевстве, за высокими горами и глубокими реками, жил-был маленький дракончик по имени Огонёк. Он был не похож на других драконов — вместо огня он выдыхал радужные пузыри.\n\nОднажды в королевство пришла великая тьма. Все рыцари пытались её победить мечами и копьями, но ничего не помогало. И тогда маленький Огонёк вышел вперёд.\n\nОн набрал побольше воздуха и выдохнул самый большой радужный пузырь, который когда-либо видел свет. Пузырь поднялся высоко-высоко и лопнул, окрасив всё небо в яркие цвета. Тьма отступила, ведь она не могла существовать там, где столько красок.\n\nС тех пор Огонёк стал самым знаменитым драконом в королевстве, а все поняли, что иногда самая необычная способность может стать самой ценной.'
+  if (p.includes('описани') || p.includes('product') || p.includes('товар'))
+    return '**Премиальное качество. Безупречный стиль.**\n\nПредставляем вашему вниманию уникальный продукт, сочетающий в себе передовые технологии и элегантный дизайн. Каждая деталь продумана до мельчайших подробностей.\n\n✅ Высококачественные материалы\n✅ Современный дизайн\n✅ Долговечность и надёжность\n✅ Полная гарантия качества\n\nИдеально подходит как для повседневного использования, так и для особых случаев.'
+  if (p.includes('стих') || p.includes('poem'))
+    return 'Среди цифровых миров и кода строк,\nГде данные летят быстрей, чем ветерок,\nРождается мечта из единиц и нулей —\nМечта о будущем, что станет всё светлей.\n\nМы строим мосты из алгоритмов и идей,\nСоединяя разум с чередой огней,\nИ каждый символ, каждый байт в строке\nНесёт надежду миру налегке.'
+  if (p.includes('код') || p.includes('code') || p.includes('функци'))
+    return '```typescript\ninterface DataProcessor<T> {\n  process(input: T): Promise<T>;\n  validate(data: T): boolean;\n}\n\nclass SmartProcessor implements DataProcessor<Record<string, unknown>> {\n  async process(input: Record<string, unknown>) {\n    const validated = this.validate(input);\n    if (!validated) throw new Error(\'Invalid data\');\n    return Object.entries(input).reduce((acc, [key, value]) => {\n      acc[key] = typeof value === \'string\' ? value.trim() : value;\n      return acc;\n    }, {} as Record<string, unknown>);\n  }\n  validate(data: Record<string, unknown>) {\n    return data !== null && Object.keys(data).length > 0;\n  }\n}\n```\n\nЭтот код демонстрирует паттерн обработки данных с валидацией и типизацией в TypeScript.'
+  return `Результат генерации по запросу: "${prompt}"\n\nЭто текст, сгенерированный AI на основе вашего промпта. В полной версии платформы здесь будет результат от настоящей языковой модели (GPT-4o, Claude, Gemini и др.).\n\nДля получения более качественных результатов:\n• Используйте подробные описания\n• Указывайте желаемый стиль и формат\n• Добавляйте контекст и примеры`
+}
+
+function mockGenerateImage(prompt: string): string {
+  const colors = [['#6366f1','#8b5cf6','#a78bfa'],['#f43f5e','#ec4899','#f472b6'],['#10b981','#14b8a6','#34d399'],['#f59e0b','#f97316','#fbbf24'],['#3b82f6','#6366f1','#818cf8']]
+  const palette = colors[Math.floor(Math.random() * colors.length)]
+  let shapes = ''
+  for (let i = 0; i < 8; i++) {
+    const cx = Math.random() * 400, cy = Math.random() * 400, r = Math.random() * 80 + 20
+    shapes += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="${palette[i % 3]}" opacity="${(Math.random()*0.5+0.2).toFixed(2)}"/>`
+  }
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400"><defs><linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:${palette[0]};stop-opacity:0.3"/><stop offset="100%" style="stop-color:${palette[2]};stop-opacity:0.3"/></linearGradient></defs><rect width="400" height="400" fill="url(#bg)"/>${shapes}<text x="200" y="380" text-anchor="middle" fill="white" font-size="11" opacity="0.6" font-family="sans-serif">AI • ${prompt.slice(0,30)}</text></svg>`
+  return `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}`
+}
 
 export function AILaboratoryPage() {
   const { t } = useI18n()
   const [activeTab, setActiveTab] = useState<AITab>('overview')
+  const [imgPrompt, setImgPrompt] = useState('')
+  const [imgModel, setImgModel] = useState('SDXL 1.0')
+  const [imgSize, setImgSize] = useState('1024x1024')
+  const [imgStyle, setImgStyle] = useState('realistic')
+  const [imgQty, setImgQty] = useState(1)
+  const [imgLoading, setImgLoading] = useState(false)
+  const [imgResults, setImgResults] = useState<string[]>([])
+  const [textPrompt, setTextPrompt] = useState('')
+  const [textModel, setTextModel] = useState('GPT-4o')
+  const [textStyle, setTextStyle] = useState('Neutral')
+  const [textLoading, setTextLoading] = useState(false)
+  const [textResult, setTextResult] = useState('')
+  const [copied, setCopied] = useState(false)
+  const [history, setHistory] = useState<GenerationResult[]>([
+    { id: 'h1', type: 'image', prompt: 'Futuristic cityscape at sunset', tokens: 5, date: '2026-04-12', model: 'SDXL 1.0' },
+    { id: 'h2', type: 'text', prompt: 'Product description for vintage jacket', tokens: 3, date: '2026-04-11', model: 'GPT-4o' },
+    { id: 'h3', type: 'image', prompt: 'Abstract geometric patterns', tokens: 5, date: '2026-04-10', model: 'DALL-E 3' },
+  ])
+
+  const handleImageGenerate = () => {
+    if (!imgPrompt.trim()) return
+    setImgLoading(true); setImgResults([])
+    setTimeout(() => {
+      const r: string[] = []
+      for (let i = 0; i < imgQty; i++) r.push(mockGenerateImage(imgPrompt))
+      setImgResults(r); setImgLoading(false)
+      setHistory(prev => [{ id: `g-${Date.now()}`, type: 'image', prompt: imgPrompt, tokens: imgQty * 5, date: new Date().toISOString().split('T')[0], model: imgModel }, ...prev])
+    }, 1500 + Math.random() * 1500)
+  }
+  const handleTextGenerate = () => {
+    if (!textPrompt.trim()) return
+    setTextLoading(true); setTextResult('')
+    setTimeout(() => {
+      setTextResult(mockGenerateText(textPrompt)); setTextLoading(false)
+      setHistory(prev => [{ id: `g-${Date.now()}`, type: 'text', prompt: textPrompt, tokens: 3, date: new Date().toISOString().split('T')[0], model: textModel }, ...prev])
+    }, 800 + Math.random() * 1200)
+  }
+  const handleCopy = () => { navigator.clipboard.writeText(textResult); setCopied(true); setTimeout(() => setCopied(false), 2000) }
 
   const sections = [
     { id: 'image' as const, icon: Image, title: t('ai.imageGen'), desc: t('ai.imageGenDesc') },
@@ -30,38 +102,19 @@ export function AILaboratoryPage() {
         </div>
         <p className="text-muted-foreground mb-8 text-lg max-w-3xl">{t('ai.desc')}</p>
 
-        {/* Tab buttons */}
         <div className="flex flex-wrap gap-2 mb-8">
-          <Button
-            variant={activeTab === 'overview' ? 'default' : 'outline'}
-            size="sm"
-            onClick={() => setActiveTab('overview')}
-          >
-            {t('common.all')}
-          </Button>
+          <Button variant={activeTab === 'overview' ? 'default' : 'outline'} size="sm" onClick={() => setActiveTab('overview')}>{t('common.all')}</Button>
           {sections.map(s => (
-            <Button
-              key={s.id}
-              variant={activeTab === s.id ? 'default' : 'outline'}
-              size="sm"
-              onClick={() => setActiveTab(s.id)}
-              className="gap-1.5"
-            >
-              <s.icon className="w-4 h-4" />
-              {s.title}
+            <Button key={s.id} variant={activeTab === s.id ? 'default' : 'outline'} size="sm" onClick={() => setActiveTab(s.id)} className="gap-1.5">
+              <s.icon className="w-4 h-4" />{s.title}
             </Button>
           ))}
         </div>
 
-        {/* Overview grid */}
         {activeTab === 'overview' && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {sections.map(section => (
-              <Card
-                key={section.id}
-                className="hover:shadow-lg hover:border-primary/30 transition-all cursor-pointer h-full group"
-                onClick={() => setActiveTab(section.id)}
-              >
+              <Card key={section.id} className="hover:shadow-lg hover:border-primary/30 transition-all cursor-pointer h-full group" onClick={() => setActiveTab(section.id)}>
                 <CardContent className="p-6">
                   <section.icon className="w-8 h-8 text-primary mb-3 group-hover:scale-110 transition-transform" />
                   <h3 className="font-semibold mb-2">{section.title}</h3>
@@ -72,165 +125,138 @@ export function AILaboratoryPage() {
           </div>
         )}
 
-        {/* Image generation tab */}
+        {/* Image generation */}
         {activeTab === 'image' && (
-          <Card>
-            <CardContent className="p-6">
+          <div className="space-y-6">
+            <Card><CardContent className="p-6">
               <h3 className="text-lg font-semibold mb-4">{t('ai.imageGen')}</h3>
               <div className="space-y-4">
                 <div>
                   <Label>{t('ai.prompt')}</Label>
-                  <textarea className="w-full border rounded-lg p-3 text-sm bg-background min-h-[120px] resize-y mt-1" placeholder={t('ai.promptPlaceholder')} />
+                  <textarea className="w-full border rounded-lg p-3 text-sm bg-background min-h-[120px] resize-y mt-1" placeholder={t('ai.promptPlaceholder')} value={imgPrompt} onChange={e => setImgPrompt(e.target.value)} />
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                  <div>
-                    <Label>{t('ai.model')}</Label>
-                    <select className="w-full mt-1 border rounded-lg px-3 py-2 text-sm bg-background">
-                      <option>SDXL 1.0</option>
-                      <option>DALL-E 3</option>
-                      <option>Midjourney v6</option>
-                    </select>
-                  </div>
-                  <div>
-                    <Label>{t('ai.size')}</Label>
-                    <select className="w-full mt-1 border rounded-lg px-3 py-2 text-sm bg-background">
-                      <option>1024x1024</option>
-                      <option>1024x768</option>
-                      <option>768x1024</option>
-                    </select>
-                  </div>
-                  <div>
-                    <Label>{t('ai.style')}</Label>
-                    <select className="w-full mt-1 border rounded-lg px-3 py-2 text-sm bg-background">
-                      <option>{t('ai.styleRealistic')}</option>
-                      <option>{t('ai.styleAnime')}</option>
-                      <option>{t('ai.stylePainting')}</option>
-                      <option>{t('ai.styleMinimal')}</option>
-                    </select>
-                  </div>
-                  <div>
-                    <Label>{t('ai.quantity')}</Label>
-                    <select className="w-full mt-1 border rounded-lg px-3 py-2 text-sm bg-background">
-                      <option>1</option>
-                      <option>2</option>
-                      <option>4</option>
-                    </select>
-                  </div>
+                  <div><Label>{t('ai.model')}</Label><select className="w-full mt-1 border rounded-lg px-3 py-2 text-sm bg-background" value={imgModel} onChange={e => setImgModel(e.target.value)}><option>SDXL 1.0</option><option>DALL-E 3</option><option>Midjourney v6</option></select></div>
+                  <div><Label>{t('ai.size')}</Label><select className="w-full mt-1 border rounded-lg px-3 py-2 text-sm bg-background" value={imgSize} onChange={e => setImgSize(e.target.value)}><option>1024x1024</option><option>1024x768</option><option>768x1024</option></select></div>
+                  <div><Label>{t('ai.style')}</Label><select className="w-full mt-1 border rounded-lg px-3 py-2 text-sm bg-background" value={imgStyle} onChange={e => setImgStyle(e.target.value)}><option value="realistic">{t('ai.styleRealistic')}</option><option value="anime">{t('ai.styleAnime')}</option><option value="painting">{t('ai.stylePainting')}</option><option value="minimal">{t('ai.styleMinimal')}</option></select></div>
+                  <div><Label>{t('ai.quantity')}</Label><select className="w-full mt-1 border rounded-lg px-3 py-2 text-sm bg-background" value={imgQty} onChange={e => setImgQty(Number(e.target.value))}><option value={1}>1</option><option value={2}>2</option><option value={4}>4</option></select></div>
                 </div>
                 <div className="flex items-center justify-between pt-2">
-                  <p className="text-sm text-muted-foreground flex items-center gap-1">
-                    <Zap className="w-4 h-4 text-warning" /> {t('ai.cost', { n: '5' })}
-                  </p>
-                  <Button className="gap-2" size="lg">
-                    <Sparkles className="w-4 h-4" /> {t('ai.generate')}
+                  <p className="text-sm text-muted-foreground flex items-center gap-1"><Zap className="w-4 h-4 text-warning" /> {t('ai.cost', { n: String(imgQty * 5) })}</p>
+                  <Button className="gap-2" size="lg" onClick={handleImageGenerate} disabled={imgLoading || !imgPrompt.trim()}>
+                    {imgLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                    {imgLoading ? t('ai.generating') : t('ai.generate')}
                   </Button>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </CardContent></Card>
+            {imgResults.length > 0 && (
+              <Card><CardContent className="p-6">
+                <h3 className="text-lg font-semibold mb-4">{t('ai.result')}</h3>
+                <div className={`grid gap-4 ${imgResults.length === 1 ? 'grid-cols-1 max-w-md mx-auto' : 'grid-cols-2'}`}>
+                  {imgResults.map((src, i) => (
+                    <div key={i} className="relative group/img rounded-xl overflow-hidden border">
+                      <img src={src} alt={`Generated ${i + 1}`} className="w-full aspect-square object-cover" />
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center">
+                        <a href={src} download={`ai-gen-${i}.svg`}><Button size="sm" variant="secondary" className="gap-2"><Download className="w-4 h-4" />{t('ai.download')}</Button></a>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </CardContent></Card>
+            )}
+          </div>
         )}
 
-        {/* Text generation tab */}
+        {/* Text generation */}
         {activeTab === 'text' && (
-          <Card>
-            <CardContent className="p-6">
+          <div className="space-y-6">
+            <Card><CardContent className="p-6">
               <h3 className="text-lg font-semibold mb-4">{t('ai.textGen')}</h3>
               <div className="space-y-4">
                 <div>
                   <Label>{t('ai.prompt')}</Label>
-                  <textarea className="w-full border rounded-lg p-3 text-sm bg-background min-h-[120px] resize-y mt-1" placeholder={t('ai.promptPlaceholder')} />
+                  <textarea className="w-full border rounded-lg p-3 text-sm bg-background min-h-[120px] resize-y mt-1" placeholder={t('ai.promptPlaceholder')} value={textPrompt} onChange={e => setTextPrompt(e.target.value)} />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label>{t('ai.model')}</Label>
-                    <select className="w-full mt-1 border rounded-lg px-3 py-2 text-sm bg-background">
-                      <option>GPT-4o</option>
-                      <option>Claude 3.5</option>
-                      <option>Gemini</option>
-                    </select>
-                  </div>
-                  <div>
-                    <Label>{t('ai.style')}</Label>
-                    <select className="w-full mt-1 border rounded-lg px-3 py-2 text-sm bg-background">
-                      <option>Neutral</option>
-                      <option>Creative</option>
-                      <option>Professional</option>
-                      <option>Casual</option>
-                    </select>
-                  </div>
+                  <div><Label>{t('ai.model')}</Label><select className="w-full mt-1 border rounded-lg px-3 py-2 text-sm bg-background" value={textModel} onChange={e => setTextModel(e.target.value)}><option>GPT-4o</option><option>Claude 3.5</option><option>Gemini</option></select></div>
+                  <div><Label>{t('ai.style')}</Label><select className="w-full mt-1 border rounded-lg px-3 py-2 text-sm bg-background" value={textStyle} onChange={e => setTextStyle(e.target.value)}><option>Neutral</option><option>Creative</option><option>Professional</option><option>Casual</option></select></div>
                 </div>
                 <div className="flex items-center justify-between pt-2">
-                  <p className="text-sm text-muted-foreground flex items-center gap-1">
-                    <Zap className="w-4 h-4 text-warning" /> {t('ai.cost', { n: '3' })}
-                  </p>
-                  <Button className="gap-2" size="lg">
-                    <Sparkles className="w-4 h-4" /> {t('ai.generate')}
+                  <p className="text-sm text-muted-foreground flex items-center gap-1"><Zap className="w-4 h-4 text-warning" /> {t('ai.cost', { n: '3' })}</p>
+                  <Button className="gap-2" size="lg" onClick={handleTextGenerate} disabled={textLoading || !textPrompt.trim()}>
+                    {textLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                    {textLoading ? t('ai.generating') : t('ai.generate')}
                   </Button>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </CardContent></Card>
+            {textResult && (
+              <Card><CardContent className="p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-semibold">{t('ai.result')}</h3>
+                  <Button size="sm" variant="outline" className="gap-2" onClick={handleCopy}>
+                    {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                    {copied ? t('ai.copied') : t('ai.copy')}
+                  </Button>
+                </div>
+                <div className="bg-muted/30 rounded-xl p-5 whitespace-pre-wrap text-sm leading-relaxed">{textResult}</div>
+              </CardContent></Card>
+            )}
+          </div>
         )}
 
-        {/* Upscale tab */}
         {activeTab === 'upscale' && (
-          <Card>
-            <CardContent className="p-6">
-              <h3 className="text-lg font-semibold mb-4">{t('ai.upscale')}</h3>
-              <div className="border-2 border-dashed rounded-xl p-12 text-center">
-                <ArrowUpRight className="w-12 h-12 text-muted-foreground/40 mx-auto mb-4" />
-                <p className="text-muted-foreground mb-4">{t('ai.upscaleDesc')}</p>
-                <Button variant="outline">{t('ai.generate')}</Button>
-              </div>
-            </CardContent>
-          </Card>
+          <Card><CardContent className="p-6">
+            <h3 className="text-lg font-semibold mb-4">{t('ai.upscale')}</h3>
+            <div className="border-2 border-dashed rounded-xl p-12 text-center">
+              <ArrowUpRight className="w-12 h-12 text-muted-foreground/40 mx-auto mb-4" />
+              <p className="text-muted-foreground mb-2">{t('ai.upscaleDesc')}</p>
+              <p className="text-sm text-muted-foreground mb-4">{t('ai.dragOrClick')}</p>
+              <Button variant="outline">{t('ai.uploadImage')}</Button>
+            </div>
+          </CardContent></Card>
         )}
 
-        {/* Variations tab */}
         {activeTab === 'variation' && (
-          <Card>
-            <CardContent className="p-6">
-              <h3 className="text-lg font-semibold mb-4">{t('ai.variations')}</h3>
-              <div className="border-2 border-dashed rounded-xl p-12 text-center">
-                <Sparkles className="w-12 h-12 text-muted-foreground/40 mx-auto mb-4" />
-                <p className="text-muted-foreground mb-4">{t('ai.variationsDesc')}</p>
-                <Button variant="outline">{t('ai.generate')}</Button>
-              </div>
-            </CardContent>
-          </Card>
+          <Card><CardContent className="p-6">
+            <h3 className="text-lg font-semibold mb-4">{t('ai.variations')}</h3>
+            <div className="border-2 border-dashed rounded-xl p-12 text-center">
+              <Sparkles className="w-12 h-12 text-muted-foreground/40 mx-auto mb-4" />
+              <p className="text-muted-foreground mb-2">{t('ai.variationsDesc')}</p>
+              <p className="text-sm text-muted-foreground mb-4">{t('ai.dragOrClick')}</p>
+              <Button variant="outline">{t('ai.uploadImage')}</Button>
+            </div>
+          </CardContent></Card>
         )}
 
-        {/* History tab */}
         {activeTab === 'history' && (
-          <Card>
-            <CardContent className="p-6">
-              <h3 className="text-lg font-semibold mb-4">{t('ai.history')}</h3>
+          <Card><CardContent className="p-6">
+            <h3 className="text-lg font-semibold mb-4">{t('ai.history')}</h3>
+            {history.length === 0 ? (
+              <p className="text-center text-muted-foreground py-8">{t('ai.noHistory')}</p>
+            ) : (
               <div className="space-y-3">
-                {[
-                  { type: 'image', prompt: 'Futuristic cityscape at sunset', tokens: 5, date: '2026-04-12', status: 'done' },
-                  { type: 'text', prompt: 'Product description for vintage jacket', tokens: 3, date: '2026-04-11', status: 'done' },
-                  { type: 'image', prompt: 'Abstract geometric patterns', tokens: 5, date: '2026-04-10', status: 'done' },
-                ].map((gen, i) => (
-                  <div key={i} className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
+                {history.map(gen => (
+                  <div key={gen.id} className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
                     <div className="flex items-center gap-3">
                       {gen.type === 'image' ? <Image className="w-5 h-5 text-primary" /> : <FileText className="w-5 h-5 text-primary" />}
                       <div>
-                        <p className="text-sm font-medium">{gen.prompt}</p>
-                        <p className="text-xs text-muted-foreground">{gen.date}</p>
+                        <p className="text-sm font-medium">{gen.prompt.length > 50 ? gen.prompt.slice(0, 50) + '...' : gen.prompt}</p>
+                        <p className="text-xs text-muted-foreground">{gen.date} • {gen.model}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Badge variant="success">{gen.status}</Badge>
+                      <Badge variant="success">done</Badge>
                       <span className="text-xs text-muted-foreground">{gen.tokens} tokens</span>
                     </div>
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
+            )}
+          </CardContent></Card>
         )}
 
-        {/* Subscription tab */}
         {activeTab === 'subscription' && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
@@ -244,11 +270,7 @@ export function AILaboratoryPage() {
                   <h3 className="text-xl font-bold mb-2">{plan.name}</h3>
                   <p className="text-3xl font-bold text-primary mb-4">{plan.price}<span className="text-sm text-muted-foreground font-normal">/mo</span></p>
                   <ul className="space-y-2 text-sm text-muted-foreground mb-6">
-                    {plan.features.map(f => (
-                      <li key={f} className="flex items-center gap-2 justify-center">
-                        <Sparkles className="w-3 h-3 text-primary" /> {f}
-                      </li>
-                    ))}
+                    {plan.features.map(f => <li key={f} className="flex items-center gap-2 justify-center"><Sparkles className="w-3 h-3 text-primary" /> {f}</li>)}
                   </ul>
                   <Button className="w-full" variant={i === 1 ? 'default' : 'outline'}>{t('term.getAccess')}</Button>
                 </CardContent>
