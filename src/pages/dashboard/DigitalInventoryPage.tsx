@@ -1,11 +1,26 @@
+import { useState } from 'react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { useI18n } from '@/i18n/I18nProvider'
-import { Download, BookOpen, Key, Image, Box, Info } from 'lucide-react'
+import { Download, BookOpen, Key, Image, Box, Info, CheckCircle } from 'lucide-react'
 
 export function DigitalInventoryPage() {
   const { t } = useI18n()
+  const [downloaded, setDownloaded] = useState<string | null>(null)
+
+  const handleDownload = (asset: { id: string; title: string; format: string }) => {
+    const content = `RULWEAR.ORG — Цифровой актив\n\nНазвание: ${asset.title}\nФормат: ${asset.format}\nДата загрузки: ${new Date().toLocaleDateString()}\n\n--- Содержимое актива ---\nЭто демонстрационный файл.\nВ полной версии платформы здесь будет реальный цифровой контент.\n\n© RULWEAR.ORG`
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `${asset.title.replace(/[^a-zA-Zа-яА-Я0-9]/g, '_')}.txt`
+    a.click()
+    URL.revokeObjectURL(url)
+    setDownloaded(asset.id)
+    setTimeout(() => setDownloaded(null), 2500)
+  }
 
   const assets = [
     { id: '1', title: 'Коллекция фэнтези-книг', type: 'book', format: 'PDF/EPUB', date: '08.04.2026', icon: BookOpen },
@@ -38,8 +53,17 @@ export function DigitalInventoryPage() {
                       <Info className="w-3.5 h-3.5" /> {t('dashboard.instructions')}
                     </Button>
                   )}
-                  <Button size="sm" className="gap-1">
-                    <Download className="w-3.5 h-3.5" /> {t('object.download')}
+                  <Button
+                    size="sm"
+                    className="gap-1"
+                    variant={downloaded === asset.id ? 'outline' : 'default'}
+                    onClick={() => handleDownload(asset)}
+                  >
+                    {downloaded === asset.id ? (
+                      <><CheckCircle className="w-3.5 h-3.5 text-green-500" /> Скачано</>
+                    ) : (
+                      <><Download className="w-3.5 h-3.5" /> {t('object.download')}</>
+                    )}
                   </Button>
                 </div>
               </div>

@@ -25,6 +25,7 @@ export function CatalogPage() {
   const [selectedCategory, setSelectedCategory] = useState('')
   const [showFilters, setShowFilters] = useState(true)
   const [sortBy, setSortBy] = useState<'date' | 'compensation' | 'views' | 'comments'>('date')
+  const [showSortMenu, setShowSortMenu] = useState(false)
 
   const getText = (obj: Record<string, string>) => obj[lang] || obj.ru || ''
 
@@ -199,18 +200,40 @@ export function CatalogPage() {
                   <SlidersHorizontal className="w-4 h-4" /> {t('catalog.filters')}
                 </Button>
               )}
-              <div className="flex items-center gap-1">
-                <ArrowUpDown className="w-4 h-4 text-muted-foreground" />
-                <select
-                  value={sortBy}
-                  onChange={e => setSortBy(e.target.value as typeof sortBy)}
-                  className="text-sm bg-background border rounded px-2 py-1"
+              <div className="relative">
+                <button
+                  onClick={() => setShowSortMenu(v => !v)}
+                  className="flex items-center gap-1.5 text-sm bg-background border rounded-lg px-3 py-1.5 hover:bg-accent transition-colors"
                 >
-                  <option value="date">{t('catalog.sortByDate')}</option>
-                  <option value="compensation">{t('catalog.sortByCompensation')}</option>
-                  <option value="views">{t('catalog.sortByViews')}</option>
-                  <option value="comments">{t('catalog.sortByComments')}</option>
-                </select>
+                  <ArrowUpDown className="w-4 h-4 text-muted-foreground" />
+                  {{
+                    date: t('catalog.sortByDate'),
+                    compensation: t('catalog.sortByCompensation'),
+                    views: t('catalog.sortByViews'),
+                    comments: t('catalog.sortByComments'),
+                  }[sortBy]}
+                  <ChevronRight className={`w-3.5 h-3.5 text-muted-foreground transition-transform ${showSortMenu ? 'rotate-90' : ''}`} />
+                </button>
+                {showSortMenu && (
+                  <div className="absolute right-0 top-full mt-1 z-30 bg-background border rounded-lg shadow-lg py-1 min-w-[180px]">
+                    {(['date', 'compensation', 'views', 'comments'] as const).map(key => (
+                      <button
+                        key={key}
+                        onClick={() => { setSortBy(key); setShowSortMenu(false) }}
+                        className={`w-full text-left px-4 py-2 text-sm hover:bg-accent transition-colors ${
+                          sortBy === key ? 'text-primary font-medium bg-primary/5' : ''
+                        }`}
+                      >
+                        {{
+                          date: t('catalog.sortByDate'),
+                          compensation: t('catalog.sortByCompensation'),
+                          views: t('catalog.sortByViews'),
+                          comments: t('catalog.sortByComments'),
+                        }[key]}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>

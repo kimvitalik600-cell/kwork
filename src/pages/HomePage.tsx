@@ -86,10 +86,10 @@ export function HomePage() {
   }
 
   const serviceHighlights = [
-    { icon: Search, label: t('home.serviceSearch'), color: 'from-blue-500 to-cyan-500' },
-    { icon: Shield, label: t('home.serviceVerification'), color: 'from-emerald-500 to-green-500' },
-    { icon: Cpu, label: t('home.serviceAI'), color: 'from-violet-500 to-purple-500' },
-    { icon: Store, label: t('home.serviceMarket'), color: 'from-orange-500 to-amber-500' },
+    { icon: Search, label: t('home.serviceSearch'), color: 'from-blue-500 to-cyan-500', to: '/catalog' },
+    { icon: Shield, label: t('home.serviceVerification'), color: 'from-emerald-500 to-green-500', to: '/dashboard/verification' },
+    { icon: Cpu, label: t('home.serviceAI'), color: 'from-violet-500 to-purple-500', to: '/ai' },
+    { icon: Store, label: t('home.serviceMarket'), color: 'from-orange-500 to-amber-500', to: '/market' },
   ]
 
   const trustMetrics = [
@@ -167,12 +167,12 @@ export function HomePage() {
                     {/* Mock service grid */}
                     <div className="grid grid-cols-2 gap-3">
                       {serviceHighlights.map((s, i) => (
-                        <div key={i} className="flex items-center gap-3 p-3 rounded-xl bg-muted/50 border border-border/50">
+                        <Link key={i} to={s.to} className="flex items-center gap-3 p-3 rounded-xl bg-muted/50 border border-border/50 hover:bg-muted/80 hover:border-primary/30 transition-all cursor-pointer">
                           <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${s.color} flex items-center justify-center`}>
                             <s.icon className="w-5 h-5 text-white" />
                           </div>
                           <span className="text-sm font-medium">{s.label}</span>
-                        </div>
+                        </Link>
                       ))}
                     </div>
                     {/* Mock stats */}
