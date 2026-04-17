@@ -14,6 +14,12 @@ export function DashboardSettingsPage() {
   const [name, setName] = useState(user?.name ?? '')
   const [saved, setSaved] = useState(false)
 
+  const [notifEmail, setNotifEmail] = useState(true)
+  const [notifPush, setNotifPush] = useState(true)
+  const [notifMarketing, setNotifMarketing] = useState(false)
+  const [notifOrders, setNotifOrders] = useState(true)
+  const [notifSaved, setNotifSaved] = useState(false)
+
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault()
     // Would update via auth context in a real app
@@ -85,7 +91,38 @@ export function DashboardSettingsPage() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">{t('common.sectionInDevelopment')}</p>
+          <div className="space-y-4 max-w-md">
+            {[
+              { label: 'Email-уведомления', desc: 'Получать уведомления на email', value: notifEmail, set: setNotifEmail },
+              { label: 'Push-уведомления', desc: 'Уведомления в браузере', value: notifPush, set: setNotifPush },
+              { label: 'Статус заказов', desc: 'Обновления по вашим заявкам и инвойсам', value: notifOrders, set: setNotifOrders },
+              { label: 'Маркетинговые рассылки', desc: 'Акции, новинки и специальные предложения', value: notifMarketing, set: setNotifMarketing },
+            ].map(item => (
+              <label key={item.label} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg cursor-pointer hover:bg-muted/50 transition-colors">
+                <div>
+                  <p className="text-sm font-medium">{item.label}</p>
+                  <p className="text-xs text-muted-foreground">{item.desc}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => item.set(!item.value)}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${item.value ? 'bg-primary' : 'bg-muted-foreground/30'}`}
+                >
+                  <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${item.value ? 'translate-x-6' : 'translate-x-1'}`} />
+                </button>
+              </label>
+            ))}
+            <div className="flex items-center gap-3 pt-2">
+              <Button size="sm" onClick={() => { setNotifSaved(true); setTimeout(() => setNotifSaved(false), 2500) }}>
+                {t('common.save')}
+              </Button>
+              {notifSaved && (
+                <span className="flex items-center gap-1.5 text-sm text-green-600">
+                  <CheckCircle className="w-4 h-4" />{t('settings.saved')}
+                </span>
+              )}
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>

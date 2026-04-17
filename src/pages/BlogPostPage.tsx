@@ -1,11 +1,13 @@
+import { useState } from 'react'
 import { Link, useParams, useNavigate } from 'react-router-dom'
 import { useI18n } from '@/i18n/I18nProvider'
-import { mockBlogPosts, mockObjects } from '@/data/mockData'
+import { mockBlogPosts, mockObjects, mockComments } from '@/data/mockData'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { ArrowLeft, Calendar, MessageCircle, Tag, BookOpen, Newspaper, FileText, ExternalLink } from 'lucide-react'
+import { ArrowLeft, Calendar, MessageCircle, Tag, ExternalLink, Send, User } from 'lucide-react'
 import { NotFoundPage } from '@/pages/NotFoundPage'
+import { getBlogImage } from '@/utils/productImages'
 
 export function BlogPostPage() {
   const { slug } = useParams<{ slug: string }>()
@@ -16,13 +18,28 @@ export function BlogPostPage() {
   const post = mockBlogPosts.find(p => p.slug === slug)
   if (!post) return <NotFoundPage />
 
-  const typeIcon: Record<string, typeof BookOpen> = { unpacking: BookOpen, news: Newspaper, guide: FileText }
+  const [commentText, setCommentText] = useState('')
+  const [localComments, setLocalComments] = useState(mockComments.filter(c => c.targetType === 'blog_post' && c.targetId === post.id))
+
+  const handleAddComment = () => {
+    if (!commentText.trim()) return
+    setLocalComments(prev => [...prev, {
+      id: `com-local-${Date.now()}`,
+      userId: 'current-user',
+      userName: 'Вы',
+      content: commentText,
+      targetType: 'blog_post' as const,
+      targetId: post.id,
+      createdAt: new Date().toISOString(),
+    }])
+    setCommentText('')
+  }
+
   const typeLabel: Record<string, string> = {
     unpacking: t('blog.typeUnpacking'),
     news: t('blog.typeNews'),
     guide: t('blog.typeGuide'),
   }
-  const Icon = typeIcon[post.type] || FileText
 
   const relatedObjects = mockObjects.filter(o => post.relatedObjectIds.includes(o.id))
   const content = getText(post.content)
@@ -43,8 +60,8 @@ export function BlogPostPage() {
       </Button>
 
       {/* Cover */}
-      <div className="aspect-video bg-gradient-to-br from-primary/10 to-accent/20 rounded-xl flex items-center justify-center mb-8 relative overflow-hidden">
-        <Icon className="w-24 h-24 text-primary/20" />
+      <div className="aspect-video rounded-xl overflow-hidden mb-8 relative">
+        <img src={getBlogImage(post.type)} alt={getText(post.title)} className="w-full h-full object-cover" />
         <div className="absolute top-4 left-4">
           <Badge variant="secondary" className="text-sm">{typeLabel[post.type] || post.type}</Badge>
         </div>
@@ -113,6 +130,45 @@ export function BlogPostPage() {
           </div>
         </section>
       )}
+
+      {/* Comments section */}
+      <section className="mt-10 mb-6">
+        <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
+          <MessageCircle className="w-5 h-5" /> {t('blog.comments')} ({localComments.length})
+        </h2>
+        <div className="space-y-4 mb-6">
+          {localComments.length === 0 ? (
+            <p className="text-sm text-muted-foreground">Пока нет комментариев. Будьте первым!</p>
+          ) : (
+            localComments.map(c => (
+              <div key={c.id} className="flex gap-3 p-3 bg-muted/30 rounded-lg">
+                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                  <User className="w-4 h-4 text-primary" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-sm font-medium">{c.userName}</span>
+                    <span className="text-xs text-muted-foreground">{new Date(c.createdAt).toLocaleDateString()}</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">{c.content}</p>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+        <div className="flex gap-2">
+          <input
+            className="flex-1 rounded-lg border bg-background px-3 py-2 text-sm"
+            placeholder="Написать комментарий..."
+            value={commentText}
+            onChange={e => setCommentText(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && handleAddComment()}
+          />
+          <Button size="sm" className="gap-1" onClick={handleAddComment} disabled={!commentText.trim()}>
+            <Send className="w-4 h-4" />
+          </Button>
+        </div>
+      </section>
 
       {/* Navigation */}
       <div className="mt-12 pt-6 border-t flex items-center justify-between">

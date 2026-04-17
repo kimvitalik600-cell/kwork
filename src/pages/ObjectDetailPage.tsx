@@ -1,7 +1,8 @@
+import { useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { useI18n } from '@/i18n/I18nProvider'
 import { useInfoPackage } from '@/hooks/useInfoPackage'
-import { mockObjects } from '@/data/mockData'
+import { mockObjects, mockComments } from '@/data/mockData'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -9,8 +10,9 @@ import { Separator } from '@/components/ui/separator'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Package, ChevronRight, FileText, BookOpen, Eye, MessageCircle, Calendar,
-  Globe, Truck, Tag, Shield, Cpu, Heart, Download,
+  Globe, Truck, Tag, Shield, Cpu, Heart, Download, CheckCircle, Send, User,
 } from 'lucide-react'
+import { getObjectImage } from '@/utils/productImages'
 
 export function ObjectDetailPage() {
   const { slug } = useParams<{ slug: string }>()
@@ -20,6 +22,30 @@ export function ObjectDetailPage() {
   const getText = (obj: Record<string, string>) => obj[lang] || obj.ru || ''
 
   const object = mockObjects.find(o => o.slug === slug)
+
+  const [actionDone, setActionDone] = useState<string | null>(null)
+  const [commentText, setCommentText] = useState('')
+  const [localComments, setLocalComments] = useState(mockComments.filter(c => c.targetType === 'object'))
+
+  const handleAction = (action: string) => {
+    setActionDone(action)
+    setTimeout(() => setActionDone(null), 3000)
+  }
+
+  const handleAddComment = () => {
+    if (!commentText.trim()) return
+    const newComment = {
+      id: `com-local-${Date.now()}`,
+      userId: 'current-user',
+      userName: 'Вы',
+      content: commentText,
+      targetType: 'object' as const,
+      targetId: object?.id ?? '',
+      createdAt: new Date().toISOString(),
+    }
+    setLocalComments(prev => [...prev, newComment])
+    setCommentText('')
+  }
 
   if (!object) {
     return (
@@ -49,7 +75,7 @@ export function ObjectDetailPage() {
           {/* Main image */}
           <Card className="overflow-hidden">
             <div className="aspect-video bg-muted flex items-center justify-center">
-              <Package className="w-20 h-20 text-muted-foreground/20" />
+              <img src={getObjectImage(object.id, object.type, object.categoryId)} alt={getText(object.title)} className="w-full h-full object-cover" />
             </div>
           </Card>
 
@@ -151,7 +177,38 @@ export function ObjectDetailPage() {
               <Card>
                 <CardContent className="p-6">
                   <h3 className="text-lg font-semibold mb-4">{t('object.commentsTab')}</h3>
-                  <p className="text-muted-foreground text-sm">{t('object.commentsEmpty')}</p>
+                  <div className="space-y-4 mb-6">
+                    {localComments.filter(c => c.targetId === object.id).length === 0 ? (
+                      <p className="text-muted-foreground text-sm">{t('object.commentsEmpty')}</p>
+                    ) : (
+                      localComments.filter(c => c.targetId === object.id).map(c => (
+                        <div key={c.id} className="flex gap-3 p-3 bg-muted/30 rounded-lg">
+                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                            <User className="w-4 h-4 text-primary" />
+                          </div>
+                          <div>
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-sm font-medium">{c.userName}</span>
+                              <span className="text-xs text-muted-foreground">{new Date(c.createdAt).toLocaleDateString()}</span>
+                            </div>
+                            <p className="text-sm text-muted-foreground">{c.content}</p>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    <input
+                      className="flex-1 rounded-lg border bg-background px-3 py-2 text-sm"
+                      placeholder="Написать комментарий..."
+                      value={commentText}
+                      onChange={e => setCommentText(e.target.value)}
+                      onKeyDown={e => e.key === 'Enter' && handleAddComment()}
+                    />
+                    <Button size="sm" className="gap-1" onClick={handleAddComment} disabled={!commentText.trim()}>
+                      <Send className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -186,7 +243,16 @@ export function ObjectDetailPage() {
 
               {/* Action buttons */}
               <div className="space-y-2">
-                <Button className="w-full gap-2" size="lg">
+                {actionDone && (
+                  <div className="flex items-center gap-2 p-3 bg-green-500/10 text-green-600 rounded-lg text-sm">
+                    <CheckCircle className="w-4 h-4" />
+                    {actionDone === 'claim' && 'Заявка на получение актива отправлена!'}
+                    {actionDone === 'access' && 'Запрос на доступ отправлен!'}
+                    {actionDone === 'support' && 'Спасибо за поддержку обработки!'}
+                    {actionDone === 'materialize' && 'Запрос на материализацию создан!'}
+                  </div>
+                )}
+                <Button className="w-full gap-2" size="lg" onClick={() => handleAction('claim')}>
                   <Shield className="w-4 h-4" />
                   {t('term.claimAsset')}
                 </Button>
@@ -199,16 +265,16 @@ export function ObjectDetailPage() {
                   <Package className="w-4 h-4" />
                   {hasItem(object.id) ? t('object.alreadyInPackage') : t('term.addToInfoPackage')}
                 </Button>
-                <Button variant="secondary" className="w-full gap-2">
+                <Button variant="secondary" className="w-full gap-2" onClick={() => handleAction('access')}>
                   <FileText className="w-4 h-4" />
                   {t('term.getAccess')}
                 </Button>
-                <Button variant="ghost" className="w-full gap-2">
+                <Button variant="ghost" className="w-full gap-2" onClick={() => handleAction('support')}>
                   <Heart className="w-4 h-4" />
                   {t('object.supportProcessing')}
                 </Button>
                 {object.type !== 'material' && (
-                  <Button variant="ghost" className="w-full gap-2">
+                  <Button variant="ghost" className="w-full gap-2" onClick={() => handleAction('materialize')}>
                     <Cpu className="w-4 h-4" />
                     {t('term.materialize')}
                   </Button>

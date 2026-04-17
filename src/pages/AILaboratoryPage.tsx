@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { Badge } from '@/components/ui/badge'
 import { useI18n } from '@/i18n/I18nProvider'
-import { Cpu, Sparkles, Image, FileText, ArrowUpRight, Zap, Loader2, Download, Copy, Check } from 'lucide-react'
+import { Cpu, Sparkles, Image, FileText, ArrowUpRight, Zap, Loader2, Download, Copy, Check, X, Eye } from 'lucide-react'
 import { generateAIImage } from '@/utils/productImages'
 
 type AITab = 'overview' | 'image' | 'text' | 'upscale' | 'variation' | 'history' | 'subscription'
@@ -47,6 +47,7 @@ export function AILaboratoryPage() {
   const [textLoading, setTextLoading] = useState(false)
   const [textResult, setTextResult] = useState('')
   const [copied, setCopied] = useState(false)
+  const [historyPreview, setHistoryPreview] = useState<{ type: 'image' | 'text'; prompt: string; content: string } | null>(null)
   const [history, setHistory] = useState<GenerationResult[]>([
     { id: 'h1', type: 'image', prompt: 'Futuristic cityscape at sunset', tokens: 5, date: '2026-04-12', model: 'SDXL 1.0' },
     { id: 'h2', type: 'text', prompt: 'Product description for vintage jacket', tokens: 3, date: '2026-04-11', model: 'GPT-4o' },
@@ -227,7 +228,18 @@ export function AILaboratoryPage() {
             ) : (
               <div className="space-y-3">
                 {history.map(gen => (
-                  <div key={gen.id} className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
+                  <div
+                    key={gen.id}
+                    className="flex items-center justify-between p-4 bg-muted/30 rounded-lg hover:bg-muted/50 cursor-pointer transition-colors"
+                    onClick={() => {
+                      if (gen.type === 'image') {
+                        const src = generateAIImage(gen.prompt)
+                        setHistoryPreview({ type: 'image', prompt: gen.prompt, content: src })
+                      } else {
+                        setHistoryPreview({ type: 'text', prompt: gen.prompt, content: mockGenerateText(gen.prompt) })
+                      }
+                    }}
+                  >
                     <div className="flex items-center gap-3">
                       {gen.type === 'image' ? <Image className="w-5 h-5 text-primary" /> : <FileText className="w-5 h-5 text-primary" />}
                       <div>
@@ -238,12 +250,43 @@ export function AILaboratoryPage() {
                     <div className="flex items-center gap-2">
                       <Badge variant="success">done</Badge>
                       <span className="text-xs text-muted-foreground">{gen.tokens} tokens</span>
+                      <Eye className="w-4 h-4 text-muted-foreground" />
                     </div>
                   </div>
                 ))}
               </div>
             )}
           </CardContent></Card>
+        )}
+
+        {/* History preview modal */}
+        {historyPreview && (
+          <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={() => setHistoryPreview(null)}>
+            <div className="bg-background rounded-xl max-w-lg w-full shadow-2xl max-h-[80vh] overflow-auto" onClick={e => e.stopPropagation()}>
+              <div className="flex items-center justify-between p-5 border-b">
+                <h3 className="font-semibold">{historyPreview.type === 'image' ? 'Изображение' : 'Текст'}</h3>
+                <Button variant="ghost" size="sm" onClick={() => setHistoryPreview(null)}><X className="w-4 h-4" /></Button>
+              </div>
+              <div className="p-5">
+                <p className="text-sm text-muted-foreground mb-3">Промпт: {historyPreview.prompt}</p>
+                {historyPreview.type === 'image' ? (
+                  <div className="space-y-3">
+                    <img src={historyPreview.content} alt="Generated" className="w-full rounded-lg border" />
+                    <a href={historyPreview.content} download="ai-history.svg">
+                      <Button className="w-full gap-2"><Download className="w-4 h-4" /> Скачать</Button>
+                    </a>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="bg-muted/30 rounded-lg p-4 text-sm whitespace-pre-wrap">{historyPreview.content}</div>
+                    <Button className="w-full gap-2" onClick={() => { navigator.clipboard.writeText(historyPreview.content) }}>
+                      <Copy className="w-4 h-4" /> Копировать
+                    </Button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
         )}
 
         {activeTab === 'subscription' && (
